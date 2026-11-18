@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuantumShield Messenger | Post-Quantum E2EE Platform</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- TOP GLOBAL HEADER / SOC STATUS BAR -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="brand-logo">
+        <span class="shield-icon">🛡️</span>
+        <div class="brand-text">
+          <span class="brand-name">QuantumShield</span>
+          <span class="brand-sub">Post-Quantum Cryptographic Messenger</span>
+        </div>
+      </div>
+      <div class="pqc-status-pill">
+        <span class="status-dot pulsing"></span>
+        <span class="pqc-label">NIST FIPS 203: ML-KEM-768 ACTIVE</span>
+      </div>
+    </div>
+
+    <!-- MAIN VIEW SWITCHER TABS -->
+    <nav class="view-nav">
+      <button class="nav-tab active" data-view="chat-view">
+        <span class="nav-icon">💬</span> Messenger
+      </button>
+      <button class="nav-tab" data-view="radar-view">
+        <span class="nav-icon">📡</span> Quantum Risk Radar
+      </button>
+      <button class="nav-tab" data-view="soc-view">
+        <span class="nav-icon">📊</span> SentinelX SOC
+      </button>
+      <button class="nav-tab" data-view="vault-view">
+        <span class="nav-icon">🗝️</span> Quantum Vault
+      </button>
+      <button class="nav-tab" data-view="attack-lab-view">
+        <span class="nav-icon">⚡</span> Attack Lab
+      </button>
+    </nav>
+
+    <!-- USER PERSPECTIVE & CONTROLS -->
+    <div class="header-right">
+      <div class="user-perspective-badge" id="currentPerspectiveBadge">
+        <span class="perspective-avatar" id="headerAvatar">N</span>
+        <div class="perspective-info">
+          <span class="perspective-title">Active Perspective</span>
+          <strong class="perspective-name" id="headerUserName">Nova (Sender)</strong>
+        </div>
+      </div>
+      <button class="btn btn-switch" id="btnSwitchPerspective" title="Switch between Nova and Orion perspectives">
+        🔄 Switch User
+      </button>
+      <button class="btn btn-vault" id="btnQuickVault" title="Open Key Vault">
+        🔐 Vault
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="app-container">
+
+    <!-- ================================================================= -->
+    <!-- VIEW 1: MESSENGER (Modern Dark Chat Interface - Reference Image 2) -->
+    <!-- ================================================================= -->
+    <section id="chat-view" class="view-panel active">
+      <div class="chat-layout">
+
+        <!-- LEFT SIDEBAR: CHANNELS & CONVERSATIONS -->
+        <aside class="chat-sidebar">
+          
+          <!-- CURRENT LOGGED USER CARD -->
+          <div class="user-card">
+            <div class="avatar-wrapper">
+              <div class="avatar" id="sidebarAvatar">N</div>
+              <span class="avatar-badge quantum-ready" title="ML-KEM-768 Enrolled"></span>
+            </div>
+            <div class="user-details">
+              <h4 id="sidebarUserName">Nova</h4>
+              <span class="user-role">Security Engineer • Online</span>
+              <span class="crypto-id" id="sidebarCryptoId">Ed25519: <code class="mono-short">ed25519_8f2a...c09</code></span>
+            </div>
+          </div>
+
+          <!-- CRYPTO ALGORITHM STACK TICKER -->
+          <div class="crypto-ticker">
+            <div class="ticker-header">
+              <span>POST-QUANTUM PIPELINE</span>
+              <span class="badge badge-emerald">L4 SECURE</span>
+            </div>
+            <div class="ticker-tags">
+              <span class="pill-tag" title="Key Encapsulation Mechanism (NIST FIPS 203)">ML-KEM-768</span>
+              <span class="pill-tag" title="Key Derivation (RFC 5869)">HKDF-SHA256</span>
+              <span class="pill-tag" title="Authenticated Payload Encryption (NIST SP 800-38D)">AES-256-GCM</span>
+              <span class="pill-tag" title="Digital Signatures (RFC 8032)">Ed25519</span>
+            </div>
+          </div>
+
+          <!-- SEARCH FILTER -->
+          <div class="sidebar-search">
+            <span class="search-icon">🔍</span>
+            <input type="text" placeholder="Search conversations or keys..." id="contactSearchInput">
+          </div>
+
+          <!-- CHANNELS SECTION -->
+          <div class="sidebar-section-title">CHANNELS</div>
+          <ul class="nav-list channels-list">
+            <li class="nav-item active-channel">
+              <span class="channel-hash">#</span> quantum-safe-ops
+              <span class="badge badge-subtle">Encrypted</span>
+            </li>
+            <li class="nav-item">
+              <span class="channel-hash">#</span> incident-response
+            </li>
+            <li class="nav-item">
+              <span class="channel-hash">#</span> lattice-key-exchange
+            </li>
+          </ul>
+
+          <!-- DIRECT MESSAGES SECTION -->
+          <div class="sidebar-section-title">DIRECT MESSAGES (PEER-TO-PEER PQC)</div>
+          <ul class="nav-list contacts-list" id="contactsList">
+            <li class="contact-item active" data-contact="Orion">
+              <div class="contact-avatar">O</div>
+              <div class="contact-info">
+                <div class="contact-header">
+                  <span class="contact-name">Orion</span>
+                  <span class="message-time">Just now</span>
+                </div>
+                <div class="contact-preview">
+                  <span class="lock-indicator">🔒</span>
+                  <span class="preview-text">Shared secret established via ML-KEM...</span>
+                </div>
+              </div>
+              <span class="status-indicator online"></span>
+            </li>
+
+            <li class="contact-item" data-contact="Alice">
+              <div class="contact-avatar avatar-purple">A</div>
+              <div class="contact-info">
+                <div class="contact-header">
+                  <span class="contact-name">Alice</span>
+                  <span class="message-time">12:45 PM</span>
+                </div>
+                <div class="contact-preview">
+                  <span class="preview-text">Re-keying schedule completed for node 04</span>
+                </div>
+              </div>
+              <span class="status-indicator idle"></span>
+            </li>
+
+            <li class="contact-item adversary-item" data-contact="Eve">
+              <div class="contact-avatar avatar-red">E</div>
+              <div class="contact-info">
+                <div class="contact-header">
+                  <span class="contact-name">Eve (Adversary Node)</span>
+                  <span class="message-time">Untrusted</span>
+                </div>
+                <div class="contact-preview text-danger">
+                  <span>⚠️ Unauthenticated MITM Entity</span>
+                </div>
+              </div>
+              <span class="status-indicator blocked"></span>
+            </li>
+          </ul>
+
+          <!-- BOTTOM ATTACK QUICK TOGGLE -->
+          <div class="sidebar-footer-widget">
+            <div class="widget-row">
+              <span class="widget-title">Simulate MITM Tamper</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="chkSimulateMitm">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <p class="widget-sub">When active, flips 1 bit in ciphertext to test GMAC integrity rejection.</p>
+          </div>
+
+        </aside>
+
+        <!-- CENTER CHAT AREA -->
+        <section class="chat-main">
+          
+          <!-- CHAT HEADER -->
+          <div class="chat-header">
+            <div class="chat-header-user">
+              <div class="avatar avatar-teal" id="activeChatAvatar">O</div>
+              <div class="chat-header-meta">
+                <div class="chat-header-title">
+                  <h3 id="activeChatName">Orion</h3>
+                  <span class="badge badge-success">✓ Verified Ed25519 Peer</span>
+                  <span class="badge badge-pqc">ML-KEM-768 Locked</span>
+                </div>
+                <span class="chat-header-sub">UI/UX Lead & Quantum Node • Session Key: <code class="mono-short" id="headerSessionKeySnippet">e3b0...c289</code></span>
+              </div>
+            </div>
+
+            <div class="chat-header-actions">
+              <button class="icon-btn" id="btnToggleDetails" title="Toggle Cryptographic Details Panel">
+                ℹ️
+              </button>
+              <button class="icon-btn" id="btnTriggerKeyExchange" title="Initiate Lattice ML-KEM-768 Handshake">
+                🔑 Key Handshake
+              </button>
+              <button class="icon-btn" id="btnExportTranscript" title="Export Security Transcript">
+                📄
+              </button>
+            </div>
+          </div>
+
+          <!-- REAL-TIME PROTOCOL NOTIFICATION BANNER -->
+          <div class="security-banner" id="securityBanner">
+            <span class="banner-icon">🛡️</span>
+            <span class="banner-text">
+              <strong>Post-Quantum Channel Established:</strong> All messages encrypted with 256-bit session key derived from ML-KEM-768 shared secret. Tamper-proof GMAC authentication active.
+            </span>
+            <span class="banner-close" id="btnCloseBanner">&times;</span>
+          </div>
+
+          <!-- MESSAGES CONTAINER -->
+          <div class="chat-messages" id="chatMessagesContainer">
+            
+            <div class="system-divider">
+              <span>NIST FIPS 203 Cryptographic Session Initialized</span>
+            </div>
+
+          </div>
+
+          <!-- CHAT INPUT AREA -->
+          <div class="chat-input-wrapper">
+            <div class="input-toolbar">
+              <span class="cipher-indicator">
+                <span class="lock-green">🔒</span>
+                Payload Cipher: <strong>AES-256-GCM</strong> (Key: Derived via ML-KEM-768)
+              </span>
+              <div class="toolbar-tools">
+                <button class="tool-btn" id="btnQuickTamperTest" title="Simulate Tampering with Next Outgoing Message">
+                  ⚡ Test Tamper Detection
+                </button>
+              </div>
+            </div>
+
+            <form class="chat-form" id="chatForm">
+              <button type="button" class="btn-attach" title="Attach Encrypted File/Key Bundle">📎</button>
+              <textarea 
+                id="messageInput" 
+                class="message-textarea" 
+                rows="1" 
+                placeholder="Type a secure quantum-protected message to Orion... (Press Enter to send)"></textarea>
+              <button type="submit" class="btn-send" id="btnSendMessage" title="Encrypt and Send">
+                <span class="send-text">Send</span>
+                <span class="send-icon">➤</span>
+              </button>
+            </form>
+          </div>
+
+        </section>
+
+        <!-- RIGHT SIDEBAR: CRYPTOGRAPHIC INSPECTOR (Image 2 style) -->
+        <aside class="chat-details-drawer" id="chatDetailsDrawer">
+          <div class="drawer-header">
+            <h4>Cryptographic Inspection</h4>
+            <button class="drawer-close" id="btnCloseDetails">&times;</button>
+          </div>
+
+          <div class="drawer-content">
+            
+            <!-- PEER PROFILE SUMMARY -->
+            <div class="peer-profile-card">
+              <div class="avatar avatar-large" id="drawerAvatar">O</div>
+              <h3 id="drawerPeerName">Orion</h3>
+              <p class="peer-role">Quantum Communication Node • Verified</p>
+              <div class="peer-trust-score">
+                <span class="trust-label">Cryptographic Trust Level:</span>
+                <strong class="trust-val text-success">100% (Post-Quantum)</strong>
+              </div>
+            </div>
+
+            <!-- LIVE CIPHER SPECS -->
+            <div class="crypto-spec-box">
+              <div class="spec-row">
+                <span class="spec-label">Key Exchange (PQC):</span>
+                <span class="spec-value mono">ML-KEM-768 (FIPS 203)</span>
+              </div>
+              <div class="spec-row">
+                <span class="spec-label">Encapsulation Key:</span>
+                <span class="spec-value mono">1,184 Bytes</span>
+              </div>
+              <div class="spec-row">
+                <span class="spec-label">KEM Ciphertext:</span>
+                <span class="spec-value mono">1,088 Bytes</span>
+              </div>
+              <div class="spec-row">
+                <span class="spec-label">Key Derivation:</span>
+                <span class="spec-value mono">HKDF-SHA256 (RFC 5869)</span>
+              </div>
+              <div class="spec-row">
+                <span class="spec-label">Message Cipher:</span>
+                <span class="spec-value mono">AES-256-GCM (SP 800-38D)</span>
+              </div>
+              <div class="spec-row">
+                <span class="spec-label">GMAC Tag:</span>
+                <span class="spec-value mono">128 bits (16 Bytes)</span>
+              </div>
+              <div class="spec-row">
+                <span class="spec-label">Identity Signature:</span>
+                <span class="spec-value mono">Ed25519 (RFC 8032)</span>
+              </div>
+            </div>
+
+            <!-- PUBLIC KEY DISPLAY -->
+            <div class="drawer-section">
+              <div class="section-title-row">
+                <h5>Receiver Public Key (ek)</h5>
+                <button class="btn-copy" id="btnCopyPubKey" title="Copy Public Key Hex">Copy</button>
+              </div>
+              <pre class="key-preview-box mono" id="drawerPubKeyPreview">b7a8109fc438e8... [1,184 bytes ML-KEM-768 key]</pre>
+            </div>
+
+            <!-- CURRENT DERIVED SESSION KEY (HASHED FOR SAFETY) -->
+            <div class="drawer-section">
+              <div class="section-title-row">
+                <h5>Derived Session Key Fingerprint</h5>
+              </div>
+              <pre class="key-preview-box mono" id="drawerSessionKeyPreview">SHA256: 4f53cda18c2b74df83a201...</pre>
+            </div>
+
+            <!-- RE-KEY & AUDIT BUTTONS -->
+            <div class="drawer-actions">
+              <button class="btn btn-outline" id="btnDrawerRotateKey">
+                🔄 Rotate Ephemeral Key
+              </button>
+              <button class="btn btn-danger-outline" id="btnDrawerSimulateTamper">
+                ⚠️ Inject Ciphertext Tamper
+              </button>
+            </div>
+
+          </div>
+        </aside>
+
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- VIEW 2: QUANTUM RISK POSTURE & RADAR (Reference Images 1 & 4)      -->
+    <!-- ================================================================= -->
+    <section id="radar-view" class="view-panel">
+      <div class="radar-page-container">
+        
+        <div class="page-title-bar">
+          <div>
+            <h2>Quantum-Safe Security Posture</h2>
+            <p>Continuous cryptographic discovery, Harvest Now Decrypt Later risk assessment & FIPS compliance</p>
+          </div>
+          <div class="filter-controls">
+            <span class="filter-pill">Scope: All Cryptographic Endpoints</span>
+            <span class="filter-pill">Window: Real-Time</span>
+          </div>
+        </div>
+
+        <!-- RADAR TOP STAT CARDS -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-title">Total Data In Motion</span>
+              <span class="stat-icon">🌐</span>
+            </div>
+            <div class="stat-value">89.82 GB</div>
+            <div class="stat-sub">Across active secure channels</div>
+          </div>
+
+          <div class="stat-card stat-danger">
+            <div class="stat-header">
+              <span class="stat-title">Data Exposure Risk</span>
+              <span class="stat-icon">⚠️</span>
+            </div>
+            <div class="stat-value text-danger">29.19 GB</div>
+            <div class="stat-sub">Deprecated / weak algorithms</div>
+          </div>
+
+          <div class="stat-card stat-warning">
+            <div class="stat-header">
+              <span class="stat-title">Harvest Now, Decrypt Later Risk</span>
+              <span class="stat-icon">⏳</span>
+            </div>
+            <div class="stat-value text-warning">37.53 GB</div>
+            <div class="stat-sub">Classical asymmetric (RSA/ECC)</div>
+          </div>
+
+          <div class="stat-card stat-success">
+            <div class="stat-header">
+              <span class="stat-title">Quantum Secure (ML-KEM)</span>
+              <span class="stat-icon">🛡️</span>
+            </div>
+            <div class="stat-value text-success">23.10 GB</div>
+            <div class="stat-sub">FIPS 203 lattice-protected</div>
+          </div>
+        </div>
+
+        <!-- RADAR CENTER VISUALIZATION + BREAKDOWN -->
+        <div class="radar-main-grid">
+          
+          <!-- CIRCULAR RADAR CANVAS CONTAINER -->
+          <div class="card radar-canvas-card">
+            <div class="card-header">
+              <h3>Cryptographic Risk Radar</h3>
+              <span class="badge badge-emerald">Post-Quantum Migration: In Progress</span>
+            </div>
+            <div class="radar-canvas-wrapper">
+              <canvas id="quantumRadarCanvas" width="500" height="500"></canvas>
+            </div>
+            <div class="radar-legend">
+              <span class="legend-item"><span class="legend-dot color-secure"></span> Quantum Secure (ML-KEM)</span>
+              <span class="legend-item"><span class="legend-dot color-hndl"></span> HNDL Classical Risk (RSA/ECC)</span>
+              <span class="legend-item"><span class="legend-dot color-exposure"></span> Deprecated Protocol Exposure</span>
+            </div>
+          </div>
+
+          <!-- IBM GUARDIUM STYLE COMPLIANCE POLICY TABLE (Image 4) -->
+          <div class="card compliance-card">
+            <div class="card-header">
+              <h3>Cryptographic Policy Compliance</h3>
+              <button class="btn btn-sm btn-outline" id="btnScanCompliance">Rescan Posture</button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="compliance-table">
+                <thead>
+                  <tr>
+                    <th>Policy Description</th>
+                    <th>Observed Algorithm</th>
+                    <th>Status</th>
+                    <th>Severity</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Post-Quantum KEM Enforced</td>
+                    <td><code>ML-KEM-768 (Kyber)</code></td>
+                    <td><span class="badge badge-success">Compliant</span></td>
+                    <td><span class="badge badge-subtle">Optimal</span></td>
+                  </tr>
+                  <tr>
+                    <td>Harvest Now Decrypt Later Mitigation</td>
+                    <td><code>AES-256-GCM + ML-KEM</code></td>
+                    <td><span class="badge badge-success">Active</span></td>
+                    <td><span class="badge badge-subtle">Low</span></td>
+                  </tr>
+                  <tr>
+                    <td>Non-Repudiation Identity Verification</td>
+                    <td><code>Ed25519 (RFC 8032)</code></td>
+                    <td><span class="badge badge-success">Verified</span></td>
+                    <td><span class="badge badge-subtle">Optimal</span></td>
+                  </tr>
+                  <tr>
+                    <td>Legacy RSA Key Exchange Detected</td>
+                    <td><code>RSA-2048 / Diffie-Hellman</code></td>
+                    <td><span class="badge badge-warning">Deprecating</span></td>
+                    <td><span class="badge badge-warning">High</span></td>
+                  </tr>
+                  <tr>
+                    <td>Unauthenticated Ciphertext Protection</td>
+                    <td><code>GMAC 128-bit Tag</code></td>
+                    <td><span class="badge badge-success">Enforced</span></td>
+                    <td><span class="badge badge-subtle">Optimal</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- DONUT METRICS SUMMARY -->
+            <div class="donut-metrics-row">
+              <div class="donut-box">
+                <canvas id="cipherStrengthCanvas" width="120" height="120"></canvas>
+                <div class="donut-label">
+                  <strong>71.4%</strong>
+                  <span>High Post-Quantum</span>
+                </div>
+              </div>
+              <div class="donut-box">
+                <canvas id="protocolVersionCanvas" width="120" height="120"></canvas>
+                <div class="donut-label">
+                  <strong>84.2k</strong>
+                  <span>Protected Packets</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- VIEW 3: SENTINELX SOC & THREAT INTEL (Reference Image 3)           -->
+    <!-- ================================================================= -->
+    <section id="soc-view" class="view-panel">
+      <div class="soc-container">
+        
+        <div class="page-title-bar">
+          <div>
+            <h2>SentinelX Incident Command Center</h2>
+            <p>Real-time threat modeling, GMAC integrity alerts, and active cryptographic node topology</p>
+          </div>
+          <div class="header-pills">
+            <span class="status-pill-elevated">Global Threat Level: ELEVATED (DEFCON 3)</span>
+          </div>
+        </div>
+
+        <!-- TOP METRIC CARDS -->
+        <div class="soc-metrics-row">
+          <div class="soc-card">
+            <span class="soc-card-label">Threat Level</span>
+            <div class="soc-card-val text-warning">Elevated</div>
+            <span class="soc-card-sub">DEFCON 3 equivalent</span>
+          </div>
+          <div class="soc-card">
+            <span class="soc-card-label">Active Tamper Incidents</span>
+            <div class="soc-card-val text-danger" id="socActiveIncidentsCount">0</div>
+            <span class="soc-card-sub">Blocked via GMAC Tag</span>
+          </div>
+          <div class="soc-card">
+            <span class="soc-card-label">Cryptographic Nodes Online</span>
+            <div class="soc-card-val text-success">1,402</div>
+            <span class="soc-card-sub">99.98% Handshake Uptime</span>
+          </div>
+          <div class="soc-card">
+            <span class="soc-card-label">Packet Throughput</span>
+            <div class="soc-card-val">4.2 TB/s</div>
+            <span class="soc-card-sub">Standard Baseline</span>
+          </div>
+        </div>
+
+        <!-- MIDDLE GRIDS: INTEGRITY GAUGE & LIVE TOPOGRAPHY -->
+        <div class="soc-mid-grid">
+          
+          <!-- SYSTEM INTEGRITY GAUGE CARD -->
+          <div class="card">
+            <div class="card-header">
+              <h3>System Cryptographic Integrity</h3>
+              <button class="btn btn-sm btn-outline">Diagnostics</button>
+            </div>
+            <div class="integrity-gauge-container">
+              <div class="gauge-circle">
+                <span class="gauge-percent" id="socIntegrityScore">98%</span>
+                <span class="gauge-caption">Overall Integrity Score</span>
+              </div>
+              <div class="gauge-breakdown">
+                <div class="breakdown-item">
+                  <span>ML-KEM Key Exchange:</span>
+                  <strong class="text-success">Active / Valid</strong>
+                </div>
+                <div class="breakdown-item">
+                  <span>AES-256-GCM Nonce Uniqueness:</span>
+                  <strong class="text-success">100% (No Reuse)</strong>
+                </div>
+                <div class="breakdown-item">
+                  <span>Ed25519 Signatures:</span>
+                  <strong class="text-success">Verified</strong>
+                </div>
+                <div class="breakdown-item">
+                  <span>GMAC Tamper Interceptions:</span>
+                  <strong id="socTamperInterceptionsText">0 Blocked</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- LIVE TOPOGRAPHY CARD -->
+          <div class="card">
+            <div class="card-header">
+              <h3>Live Cryptographic Topography</h3>
+              <span class="badge badge-subtle">3 Nodes Engaged</span>
+            </div>
+            <div class="topography-container">
+              <div class="topo-node topo-sender">
+                <div class="topo-icon">💻</div>
+                <strong>Nova (Sender)</strong>
+                <span>pk_Nova (Ed25519)</span>
+              </div>
+              <div class="topo-line" id="topoLineA">
+                <span class="topo-packet" id="topoPacketA">🔒 AES-256-GCM</span>
+              </div>
+              <div class="topo-node topo-mitm" id="topoMitmNode">
+                <div class="topo-icon">⚠️</div>
+                <strong>Eve (Adversary)</strong>
+                <span>MITM Probe</span>
+              </div>
+              <div class="topo-line" id="topoLineB">
+                <span class="topo-packet" id="topoPacketB">✓ Authenticated</span>
+              </div>
+              <div class="topo-node topo-receiver">
+                <div class="topo-icon">🖥️</div>
+                <strong>Orion (Receiver)</strong>
+                <span>ek_Orion (ML-KEM)</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- BOTTOM CONNECTED NODES TABLE -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Connected Cryptographic Nodes & Assets</h3>
+          </div>
+          <table class="compliance-table">
+            <thead>
+              <tr>
+                <th>Node Name</th>
+                <th>Role</th>
+                <th>Active PQC Cipher</th>
+                <th>Integrity Score</th>
+                <th>Threat Status</th>
+              </tr>
+            </thead>
+            <tbody id="socNodesTableBody">
+              <tr>
+                <td><strong>node-nova-01</strong></td>
+                <td>Sender / Client</td>
+                <td><code>ML-KEM-768 + AES-256-GCM</code></td>
+                <td><strong class="text-success">100%</strong></td>
+                <td><span class="badge badge-success">Secure</span></td>
+              </tr>
+              <tr>
+                <td><strong>node-orion-02</strong></td>
+                <td>Receiver / Key Broker</td>
+                <td><code>ML-KEM-768 + Ed25519</code></td>
+                <td><strong class="text-success">100%</strong></td>
+                <td><span class="badge badge-success">Secure</span></td>
+              </tr>
+              <tr>
+                <td><strong>node-eve-proxy</strong></td>
+                <td>Interception Relay</td>
+                <td><code>Unknown / Unsigned</code></td>
+                <td><strong class="text-danger">12%</strong></td>
+                <td><span class="badge badge-danger">Untrusted</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- VIEW 4: CYBER FORTRESS QUANTUM VAULT (Reference Image 5)           -->
+    <!-- ================================================================= -->
+    <section id="vault-view" class="view-panel">
+      <div class="vault-container">
+        
+        <div class="vault-hero">
+          <div class="vault-icon-neon">🔐</div>
+          <h1 class="vault-title">QUANTUM VAULT</h1>
+          <p class="vault-subtitle">POST-QUANTUM CRYPTOGRAPHIC KEY STORAGE & ZEROIZATION CONTROL</p>
+        </div>
+
+        <div class="vault-grid">
+          
+          <!-- PROTOCOL MATRIX -->
+          <div class="vault-box">
+            <h3 class="vault-box-title">ACTIVE CRYPTOGRAPHIC PROTOCOLS</h3>
+            <ul class="vault-protocol-list">
+              <li class="protocol-item">
+                <span class="protocol-name">
+                  <span class="check-neon">✓</span> AES-256-GCM
+                </span>
+                <span class="status-neon-active">ACTIVE</span>
+              </li>
+              <li class="protocol-item">
+                <span class="protocol-name">
+                  <span class="check-neon">✓</span> ML-KEM-768 (NIST FIPS 203)
+                </span>
+                <span class="status-neon-active">ACTIVE / PQC</span>
+              </li>
+              <li class="protocol-item">
+                <span class="protocol-name">
+                  <span class="check-neon">✓</span> HKDF-SHA256 (RFC 5869)
+                </span>
+                <span class="status-neon-active">ACTIVE</span>
+              </li>
+              <li class="protocol-item">
+                <span class="protocol-name">
+                  <span class="check-neon">✓</span> Ed25519 (RFC 8032)
+                </span>
+                <span class="status-neon-active">ACTIVE</span>
+              </li>
+              <li class="protocol-item deprecated">
+                <span class="protocol-name">
+                  <span class="check-neon">✕</span> RSA-4096 (Classical)
+                </span>
+                <span class="status-neon-deprecated">DEPRECATED</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- KEY MANAGEMENT CONTROLS -->
+          <div class="vault-box">
+            <h3 class="vault-box-title">KEY MANAGEMENT COMMANDS</h3>
+            <div class="vault-btn-stack">
+              <button class="vault-btn" id="btnVaultRotate">
+                🔄 ROTATE MASTER EPHEMERAL KEY
+              </button>
+              <button class="vault-btn" id="btnVaultExport">
+                📥 EXPORT PUBLIC KEYS (.JSON)
+              </button>
+              <button class="vault-btn btn-purge" id="btnVaultPurge">
+                🗑️ ZEROIZE & PURGE ALL SESSION KEYS
+              </button>
+            </div>
+            <div class="vault-notice" id="vaultNoticeBox">
+              Ephemeral lattice parameters refresh automatically every 3,600 seconds or upon tamper detection.
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ENCRYPTED DATA ASSETS PREVIEW -->
+        <div class="vault-box vault-full-width">
+          <h3 class="vault-box-title">ENCRYPTED DATA ASSETS & EPHEMERAL KEY REGISTRY</h3>
+          <div class="table-responsive">
+            <table class="compliance-table vault-table">
+              <thead>
+                <tr>
+                  <th>Key ID / Handle</th>
+                  <th>Algorithm</th>
+                  <th>Owner</th>
+                  <th>Bit Strength</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="vaultKeyTableBody">
+                <tr>
+                  <td><code>key_mlkem_768_orion_01</code></td>
+                  <td>ML-KEM-768 (FIPS 203)</td>
+                  <td>Orion</td>
+                  <td>Category 3 (AES-192/256 equivalent)</td>
+                  <td><span class="text-neon">LOCKED IN VAULT</span></td>
+                </tr>
+                <tr>
+                  <td><code>key_ed25519_nova_sign</code></td>
+                  <td>Ed25519 (RFC 8032)</td>
+                  <td>Nova</td>
+                  <td>128-bit quantum, 256-bit classical</td>
+                  <td><span class="text-neon">ACTIVE</span></td>
+                </tr>
+                <tr>
+                  <td><code>sess_hkdf_aes_256_active</code></td>
+                  <td>AES-256-GCM</td>
+                  <td>Session: Nova &harr; Orion</td>
+                  <td>256-bit Symmetric</td>
+                  <td><span class="text-neon">IN MEMORY</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- VIEW 5: INTERACTIVE ATTACK LAB (Live Viva Demonstration)            -->
+    <!-- ================================================================= -->
+    <section id="attack-lab-view" class="view-panel">
+      <div class="attack-lab-container">
+        
+        <div class="page-title-bar">
+          <div>
+            <h2>Post-Quantum Cyber Attack Simulation Lab</h2>
+            <p>Interactive testing suite designed for viva examiners: test MITM ciphertext modification, replay attacks, and quantum decryption resilience</p>
+          </div>
+          <div>
+            <span class="badge badge-danger">Live Exploitation Mode</span>
+          </div>
+        </div>
+
+        <div class="attack-grid">
+          
+          <!-- ATTACK CONTROLLER -->
+          <div class="card">
+            <div class="card-header">
+              <h3>Attack Vector Selector</h3>
+            </div>
+            
+            <div class="attack-options">
+              <label class="attack-radio-card active">
+                <input type="radio" name="attackType" value="gmac_tamper" checked>
+                <div class="radio-content">
+                  <strong>1. GMAC Ciphertext Modification (Bit-Flip Attack)</strong>
+                  <p>Adversary (Eve) intercepts an AES-256-GCM packet in transit and modifies 1 byte in the ciphertext. Demonstrates instant rejection via GMAC 128-bit authentication tag verification.</p>
+                </div>
+              </label>
+
+              <label class="attack-radio-card">
+                <input type="radio" name="attackType" value="replay_attack">
+                <div class="radio-content">
+                  <strong>2. Replay Attack (Nonce Duplication)</strong>
+                  <p>Adversary records a previously authenticated packet and re-transmits it later. Demonstrates nonce validation and anti-replay window rejection.</p>
+                </div>
+              </label>
+
+              <label class="attack-radio-card">
+                <input type="radio" name="attackType" value="hndl_attack">
+                <div class="radio-content">
+                  <strong>3. Harvest Now, Decrypt Later (HNDL) Quantum Attack</strong>
+                  <p>Simulates an adversary recording traffic today to decrypt with Shor's algorithm on a future quantum computer. Compares classical RSA-2048 against ML-KEM-768 lattice resilience.</p>
+                </div>
+              </label>
+            </div>
+
+            <!-- PAYLOAD MODIFIER CONTROLS -->
+            <div class="payload-editor-box">
+              <label class="field-label">Simulated Message Payload:</label>
+              <input type="text" class="input-text" id="attackInputText" value="CONFIDENTIAL: Deploy Post-Quantum Cryptographic Root Key">
+              
+              <div class="action-buttons-row">
+                <button class="btn btn-danger" id="btnExecuteAttack">
+                  🚀 Launch Attack Simulation
+                </button>
+                <button class="btn btn-outline" id="btnResetAttack">
+                  ↺ Reset Clean Baseline
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- REAL-TIME AUDIT LOG & REACTION TERMINAL -->
+          <div class="card">
+            <div class="card-header">
+              <h3>Real-Time Security Incident Terminal</h3>
+              <span class="badge badge-subtle">Audit Output</span>
+            </div>
+
+            <div class="terminal-window" id="attackLogTerminal">
+              <div class="term-line term-info">[SYSTEM] Attack Lab Ready. Select an attack vector and click Launch.</div>
+              <div class="term-line term-info">[SYSTEM] Cryptographic algorithms loaded: ML-KEM-768, AES-256-GCM, Ed25519.</div>
+            </div>
+
+            <div class="incident-status-box" id="incidentResultCard">
+              <span class="incident-badge badge-success" id="incidentBadge">SYSTEM SECURE</span>
+              <p id="incidentExplanation">No active tampering detected. All cryptographic integrity constraints verified.</p>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- KEY INSPECTOR MODAL -->
+  <div class="modal-backdrop" id="keyModalBackdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Post-Quantum ML-KEM-768 Key Inspector</h3>
+        <button class="modal-close" id="btnCloseKeyModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p><strong>NIST FIPS 203 Module-Lattice Key Encapsulation (ML-KEM-768)</strong></p>
+        <div class="modal-field">
+          <label>Encapsulation Key (ek) [1,184 Bytes]:</label>
+          <textarea class="modal-textarea mono" id="modalEkArea" readonly></textarea>
+        </div>
+        <div class="modal-field">
+          <label>Decapsulation Key (dk) [2,400 Bytes - Private]:</label>
+          <textarea class="modal-textarea mono" id="modalDkArea" readonly>•••• PROTECTED IN SECURE ENCLAVE / ZEROIZED IN MEMORY ••••</textarea>
+        </div>
+        <div class="modal-field">
+          <label>Shared Secret (Derived via Lattice decapsulation) [32 Bytes / 256 bits]:</label>
+          <input type="text" class="input-text mono" id="modalSsField" readonly>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="btnModalCloseBtn">Close</button>
+        <button class="btn btn-success" id="btnModalCopyBundle">Copy Key Bundle</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPLICATION JAVASCRIPT SCRIPTS -->
+  <script src="js/app.js"></script>
+</body>
+</html>
