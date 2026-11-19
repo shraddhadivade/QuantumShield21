@@ -1,23 +1,29 @@
+
 """
-QuantumShield Messenger - ML-KEM-768 Implementation (NIST FIPS 203)
-Module-Lattice-Based Key-Encapsulation Mechanism
-Provides quantum-resistant asymmetric key establishment.
+QuantumShield Messenger - ML-KEM-768 Implementation
+Standard: NIST FIPS 203
+Library: kyber-py
+
+Provides genuine post-quantum key establishment.
+No insecure fallback implementation is permitted.
 """
+
 from dataclasses import dataclass
 from typing import Tuple
-import os
 
 try:
     from kyber_py.ml_kem import ML_KEM_768
     HAVE_KYBER_PY = True
+
 except ImportError:
+    ML_KEM_768 = None
     HAVE_KYBER_PY = False
 
 
 @dataclass
 class MLKEM768Keypair:
-    public_key: bytes   # ek (encapsulation key): 1,184 bytes
-    private_key: bytes  # dk (decapsulation key): 2,400 bytes
+    public_key: bytes
+    private_key: bytes
 
     @property
     def public_key_hex(self) -> str:
@@ -29,45 +35,98 @@ class MLKEM768Keypair:
 
 
 class MLKEM768Manager:
+
     PUBLIC_KEY_SIZE = 1184
     PRIVATE_KEY_SIZE = 2400
     CIPHERTEXT_SIZE = 1088
     SHARED_SECRET_SIZE = 32
 
+    @staticmethod
+    def _require_library():
+        if not HAVE_KYBER_PY:
+            raise RuntimeError(
+                "ML-KEM-768 unavailable. "
+                "Install the required package using: "
+                "py -m pip install kyber-py"
+            )
+
     @classmethod
     def generate_keypair(cls) -> MLKEM768Keypair:
-        """Receiver Step 1: Generate an ML-KEM-768 keypair (ek, dk)."""
-        if HAVE_KYBER_PY:
-            ek, dk = ML_KEM_768.keygen()
-            return MLKEM768Keypair(public_key=bytes(ek), private_key=bytes(dk))
-        else:
-            # Deterministic standard-size fallback
-            ek = os.urandom(cls.PUBLIC_KEY_SIZE)
-            dk = os.urandom(cls.PRIVATE_KEY_SIZE)
-            return MLKEM768Keypair(public_key=ek, private_key=dk)
+        """Generate a genuine ML-KEM-768 keypair."""
+
+        cls._require_library()
+
+        ek, dk = ML_KEM_768.keygen()
+
+        public_key = bytes(ek)
+        private_key = bytes(dk)
+
+        if len(public_key) != cls.PUBLIC_KEY_SIZE:
+            raise ValueError("Invalid ML-KEM-768 public key size.")
+
+        if len(private_key) != cls.PRIVATE_KEY_SIZE:
+            raise ValueError("Invalid ML-KEM-768 private key size.")
+
+        return MLKEM768Keypair(
+            public_key=public_key,
+            private_key=private_key
+        )
 
     @classmethod
     def encapsulate(cls, public_key: bytes) -> Tuple[bytes, bytes]:
-        """Sender Step 2: Encapsulate shared secret against receiver's ek. Returns (shared_secret, ciphertext)."""
-        if HAVE_KYBER_PY:
-            if len(public_key) != cls.PUBLIC_KEY_SIZE:
-                raise ValueError(f"Invalid public key length. Expected {cls.PUBLIC_KEY_SIZE} bytes.")
-            shared_secret, ciphertext = ML_KEM_768.encaps(public_key)
-            return bytes(shared_secret), bytes(ciphertext)
-        else:
-            shared_secret = os.urandom(cls.SHARED_SECRET_SIZE)
-            ciphertext = os.urandom(cls.CIPHERTEXT_SIZE)
-            return shared_secret, ciphertext
+        """Generate shared secret and ciphertext using receiver's public key."""
+
+        cls._require_library()
+
+        if len(public_key) != cls.PUBLIC_KEY_SIZE:
+            raise ValueError(
+                f"Invalid public key length. "
+                f"Expected {cls.PUBLIC_KEY_SIZE} bytes."
+            )
+
+        shared_secret, ciphertext = ML_KEM_768.encaps(public_key)
+
+        shared_secret = bytes(shared_secret)
+        ciphertext = bytes(ciphertext)
+
+        if len(shared_secret) != cls.SHARED_SECRET_SIZE:
+            raise ValueError("Invalid shared secret size.")
+
+        if len(ciphertext) != cls.CIPHERTEXT_SIZE:
+            raise ValueError("Invalid ciphertext size.")
+
+        return shared_secret, ciphertext
 
     @classmethod
-    def decapsulate(cls, private_key: bytes, ciphertext: bytes) -> bytes:
-        """Receiver Step 3: Decapsulate shared secret using receiver's dk."""
-        if HAVE_KYBER_PY:
-            if len(private_key) != cls.PRIVATE_KEY_SIZE:
-                raise ValueError(f"Invalid private key length. Expected {cls.PRIVATE_KEY_SIZE} bytes.")
-            if len(ciphertext) != cls.CIPHERTEXT_SIZE:
-                raise ValueError(f"Invalid ciphertext length. Expected {cls.CIPHERTEXT_SIZE} bytes.")
-            shared_secret = ML_KEM_768.decaps(private_key, ciphertext)
-            return bytes(shared_secret)
-        else:
-            return os.urandom(cls.SHARED_SECRET_SIZE)
+    def decapsulate(
+        cls,
+        private_key: bytes,
+        ciphertext: bytes
+    ) -> bytes:
+        """Recover shared secret using receiver's private key."""
+
+        cls._require_library()
+
+        if len(private_key) != cls.PRIVATE_KEY_SIZE:
+            raise ValueError(
+                f"Invalid private key length. "
+                f"Expected {cls.PRIVATE_KEY_SIZE} bytes."
+            )
+
+        if len(ciphertext) != cls.CIPHERTEXT_SIZE:
+            raise ValueError(
+                f"Invalid ciphertext length. "
+                f"Expected {cls.CIPHERTEXT_SIZE} bytes."
+            )
+
+        shared_secret = ML_KEM_768.decaps(
+            private_key,
+            ciphertext
+        )
+
+        shared_secret = bytes(shared_secret)
+
+        if len(shared_secret) != cls.SHARED_SECRET_SIZE:
+            raise ValueError("Invalid shared secret size.")
+
+        return shared_secret

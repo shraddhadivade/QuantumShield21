@@ -19,3 +19,29 @@ instance/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Testing and coverage
+.coverage
+.coverage.*
+.pytest_cache/
+htmlcov/
+
+# Archive files
+*.zip
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Testing and coverage
+.coverage
+.coverage.*
+.pytest_cache/
+htmlcov/
+
+# Archive files
+*.zip
+
+# Python cache
+__pycache__/
+*.py[cod]
